@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Super-Resolution</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #inputVideo {
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        }
+
+        button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        video {
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+            max-width: 100%;
+        }
+
+        a {
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        a:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Upload Video for Super-Resolution</h1>
+    <input type="file" id="inputVideo" accept="video/*">
+    <button onclick="processVideo()">Process Video</button>
+    <br>
+    <video id="outputVideo" controls></video>
+    <br>
+    <a id="downloadLink" download="output_video.mp4" style="display: none;">Download Output Video</a>
+
+    <script>
+        async function processVideo() {
+            const inputVideo = document.getElementById('inputVideo').files[0];
+            if (!inputVideo) {
+                alert('Please select a video file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('inputVideo', inputVideo);
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const outputVideoBlob = await response.blob();
+                const outputVideoUrl = URL.createObjectURL(outputVideoBlob);
+
+                const outputVideo = document.getElementById('outputVideo');
+                outputVideo.src = outputVideoUrl;
+                outputVideo.style.display = 'block';
+
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = outputVideoUrl;
+                downloadLink.style.display = 'inline-block';
+            } catch (error) {
+                console.error('Error processing video:', error);
+                alert('An error occurred while processing the video.');
+            }
+        }
+    </script>
+</body>
+
+</html>
